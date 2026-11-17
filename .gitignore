@@ -1,0 +1,54 @@
+# ── Unity 生成目录（不要提交） ──
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# ── 打包/小游戏产物 ──
+/tt-minigame/
+*.apk
+*.aab
+*.ipa
+*.unitypackage
+*.app
+
+# ── 本地备份目录（工作室自用，不进仓库） ──
+/Backup/
+/_backup*/
+/_*backup*/
+/_notused/
+/.workbuddy/
+
+# ── IDE / 工程文件 ──
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# ── 系统文件 ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── 崩溃日志 ──
+sysinfo.txt
+crashlytics-build.properties
