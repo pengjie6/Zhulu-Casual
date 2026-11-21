@@ -54,6 +54,34 @@ public class AdConfirm : MonoBehaviour
         //gameObject.SetActive(false);
         btnClose?.onClick.AddListener(this.OnClose);
         btnConfirm?.onClick.AddListener(this.OnConfirm);
+
+        RemoveWhitePlaceholders();
+    }
+
+    /// <summary>
+    /// 抖音小游戏（WebGL）里，没有 sprite 的白色 Image 会渲染成一块纯白方块，
+    /// 审核侧会判定为「小游戏渲染存在问题」。这里把这类占位白块直接关掉，
+    /// 黑色遮罩等有意义的纯色块不受影响。
+    /// </summary>
+    private void RemoveWhitePlaceholders()
+    {
+        var images = GetComponentsInChildren<Image>(true);
+
+        for (int i = 0; i < images.Length; i++)
+        {
+            var image = images[i];
+
+            if (image == null) continue;
+            if (image.sprite != null) continue;
+
+            var color = image.color;
+            if (color.a <= 0.01f) continue;
+
+            if (color.r > 0.95f && color.g > 0.95f && color.b > 0.95f)
+            {
+                image.enabled = false;
+            }
+        }
     }
 
 

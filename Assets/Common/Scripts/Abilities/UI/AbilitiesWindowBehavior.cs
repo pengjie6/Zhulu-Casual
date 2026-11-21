@@ -100,9 +100,14 @@ namespace OctoberStudio.Abilities.UI
                     cards[i].Selectable.navigation = navigation;
                 }
 
-                EventSystem.current.SetSelectedGameObject(cards[0].gameObject);
+                if (cards.Count > 0 && cards[0] != null && EventSystem.current != null)
+                {
+                    EventSystem.current.SetSelectedGameObject(cards[0].gameObject);
+                }
             });
 
+            // 订阅前先取消一次，避免同一面板被连续 Show 时重复订阅
+            GameController.InputManager.onInputChanged -= OnInputChanged;
             GameController.InputManager.onInputChanged += OnInputChanged;
         }
 
@@ -131,10 +136,16 @@ namespace OctoberStudio.Abilities.UI
 
         private void OnInputChanged(InputType prevInput, InputType inputType)
         {
-            if (prevInput == InputType.UIJoystick)
-            {
-                EventSystem.current.SetSelectedGameObject(cards[0].gameObject);
-            }
+            if (prevInput != InputType.UIJoystick) return;
+
+            // 面板关掉后 cards 已被清空，此时事件如果还有残留订阅，取 cards[0] 会越界
+            if (cards.Count == 0) return;
+            if (EventSystem.current == null) return;
+
+            var firstCard = cards[0];
+            if (firstCard == null) return;
+
+            EventSystem.current.SetSelectedGameObject(firstCard.gameObject);
         }
 
         private void OnAbilitySelected(AbilityData ability)
@@ -160,7 +171,13 @@ namespace OctoberStudio.Abilities.UI
 
         private void OnDestroy()
         {
-            cardsPool.Destroy();
+            // InputManager 是跨场景常驻的，不在这里退订会把委托留在已销毁的面板上
+            if (GameController.InputManager != null)
+            {
+                GameController.InputManager.onInputChanged -= OnInputChanged;
+            }
+
+            if (cardsPool != null) cardsPool.Destroy();
         }
     }
 }

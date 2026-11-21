@@ -114,6 +114,19 @@ namespace OctoberStudio
         {
             if (!isOffscreenTeleportEnabled) return;
 
+            // 被回收/销毁的敌人可能会以 Unity 假 null 的形式残留在列表里（复活、切场景后常见）
+            for (int i = enemies.Count - 1; i >= 0; i--)
+            {
+                if (enemies[i] == null) enemies.RemoveAt(i);
+            }
+
+            if (enemies.Count == 0) return;
+
+            var player = PlayerBehavior.Player;
+            if (player == null) return;
+
+            var playerTransform = player.transform;
+
             var diagonalSqr = (CameraManager.HalfWidth * CameraManager.HalfWidth + CameraManager.HalfHeight * CameraManager.HalfHeight) * diagonalDistanceMultiplier;
             var diagonal = Mathf.Sqrt(diagonalSqr);
 
@@ -124,15 +137,19 @@ namespace OctoberStudio
             {
                 var enemy = enemies[i];
 
-                if (enemy.WaveOverride.DisableOffscreenTeleport) continue;
+                if (enemy == null) continue;
 
-                var enemyToPlayer = enemy.transform.position - PlayerBehavior.Player.transform.position;
+                // Boss 等通过 SpawnBoss 生成的敌人没有 WaveOverride，按“允许传送”处理
+                var waveOverride = enemy.WaveOverride;
+                if (waveOverride != null && waveOverride.DisableOffscreenTeleport) continue;
+
+                var enemyToPlayer = enemy.transform.position - playerTransform.position;
                 var direction = enemyToPlayer.normalized;
-                var dot = Vector2.Dot(direction, PlayerBehavior.Player.LookDirection);
+                var dot = Vector2.Dot(direction, player.LookDirection);
 
                 if(diagonalSqr < enemyToPlayer.sqrMagnitude && dot < dotValue)
                 {
-                    var teleportPosition = PlayerBehavior.Player.transform.position + Quaternion.Euler(0, 0, Random.Range(-45, 45)) * PlayerBehavior.Player.LookDirection * diagonal;
+                    var teleportPosition = playerTransform.position + Quaternion.Euler(0, 0, Random.Range(-45, 45)) * player.LookDirection * diagonal;
                     enemy.transform.position = teleportPosition;
                 }
             }

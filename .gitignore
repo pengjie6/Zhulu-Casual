@@ -52,3 +52,6 @@ desktop.ini
 # ── 崩溃日志 ──
 sysinfo.txt
 crashlytics-build.properties
+
+# ── 混淆器每次打包都会重写的日志/临时产物 ──
+/Assets/OPS/Obfuscator/Log/
